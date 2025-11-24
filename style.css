@@ -1,0 +1,665 @@
+/* Estilos generales */
+:root {
+    --color-primario: #005a9c;
+    --color-secundario: #f0f4f8;
+    --color-texto: #333;
+    --color-correcto: #28a745;
+    --color-incorrecto: #dc3545;
+    --color-blanco: #ffffff;
+    --color-borde: #ced4da;
+    --color-beige-fondo: #D3C5AA;
+    --color-beige-boton: #a98f64;
+    --color-beige-boton-hover: #937a50;
+    --color-africa-naranja: #f0ad4e; /* <-- Color de África */
+}
+
+body {
+    /* --- FUENTE "ANTIGUA" APLICADA --- */
+    font-family: 'Old Standard TT', serif;
+    background-color: var(--color-secundario);
+    color: var(--color-texto);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+    box-sizing: border-box;
+    /* --- FONDO GEOGRAFÍA --- */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cg fill-opacity='0.3' fill='%23D3C5AA'%3E%3C!-- Montaña --%3E%3Cpath d='M50 60 L65 90 L35 90 Z M60 70 L70 90 L50 90 Z' transform='translate(5 5) scale(0.9)'/%3E%3C!-- Lupa --%3E%3Cpath d='M39.8 41.1c-1.2 1.2-2.8 1.9-4.5 1.9s-3.3-.7-4.5-1.9c-2.5-2.5-2.5-6.6 0-9.1 2.5-2.5 6.6-2.5 9.1 0 2.5 2.5 2.5 6.6 0 9.1z m1.4-10.5c-3.1-3.1-8.2-3.1-11.3 0-3.1 3.1-3.1 8.2 0 11.3 3.1 3.1 8.2 3.1 11.3 0 3.1-3.1 3.1-8.2 0-11.3z m6.1 12.3l-1.4-1.4c.7-1 1.2-2.2 1.4-3.5l2 .4c-.2 1.5-.8 2.9-1.6 4.1z m-3.1 4.3l-1.4-1.4c1-1.3 1.7-2.8 1.9-4.5l2 .4c-.2 1.9-.9 3.6-2.1 5.1z m-1.6 2.6c-.2.1-.4.2-.6.3l.4 2c.3-.1.7-.2 1-.3l-.8-2z m-1 .5c-.3.1-.6.2-.9.3l.4 2c.3-.1.7-.2 1-.3l-.5-2z m8.1-1.9l-1.4-1.4c.5-.7.9-1.4 1.2-2.2l1.7 1.1c-.4.9-.9 1.8-1.5 2.5z m-1.3 2.9l-1.4-1.4c.8-.9 1.4-2 1.8-3.1l1.9.7c-.4 1.3-1.1 2.5-1.9 3.8z' transform='translate(60 10) scale(1.5)'/%3E%3C!-- Globo --%3E%3Cpath d='M49.1 20.3c-.4-.1-.8-.1-1.2 0 -1.7.3-3.2 1.2-4.4 2.4 -2.4 2.4-3.8 5.6-3.8 9 0 3.4 1.4 6.6 3.8 9 1.2 1.2 2.7 2 4.4 2.4 .4.1.8.1 1.2 0 1.7-.3 3.2-1.2 4.4-2.4 2.4-2.4 3.8-5.6 3.8-9 0-3.4-1.4-6.6-3.8-9 -1.2-1.2-2.7-2-4.4-2.4z M48.5 22.4c.1 0 .2.1.3.1 1.4.3 2.7 1 3.7 2 1.9 1.9 3 4.5 3 7.2s-1.1 5.3-3 7.2c-1 1-2.3 1.7-3.7 2 -.1 0-.2.1-.3.1s-.2 0-.3-.1c-1.4-.3-2.7-1-3.7-2 -1.9-1.9-3-4.5-3-7.2s1.1-5.3 3-7.2c1-1 2.3-1.7 3.7-2C48.3 22.4 48.4 22.4 48.5 22.4z M49.5 28.1c-.3 1.2-1 2.3-1.9 3.1 -1 1-2.2 1.6-3.6 1.8l-.5.1v-1.6c0-1.1.9-2 2-2h1.3c.7 0 1.3-.4 1.6-1L49.5 28.1z M46.5 34.6c1.1-.3 2.1-1 2.8-1.9 1-1.2 1.6-2.7 1.6-4.3 0-.2 0-.4-.1-.6l-1.1.3c-.6.2-1.3-.1-1.6-.7l-.8-1.6c-.2-.4-.6-.6-1-.6h-1.3c-1.1 0-2 .9-2 2v1.6l.5-.1C45 36.3 45.7 35.6 46.5 34.6z' transform='translate(20 70) scale(1.2)'/%3E%3C/g%3E%3C/svg%3E");
+    background-repeat: repeat;
+    text-shadow: 0.5px 0.5px 1px rgba(0, 0, 0, 0.1);
+}
+
+.container {
+    background-color: var(--color-blanco);
+    border-radius: 15px; 
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    padding: 15px 20px; /* REDUCIDO: Antes era 30px */
+    width: 95%;         /* AUMENTADO: Aprovecha más el ancho */
+    max-width: 700px;
+    text-align: center;
+    
+    /* NUEVO: Ajuste vertical */
+    max-height: 98vh;   /* Nunca ocupará más del 98% de la altura de la pantalla */
+    overflow-y: auto;   /* Si la pantalla es minúscula (reloj/móvil antiguo), permitirá scroll */
+    display: flex;      /* Usamos Flexbox para distribuir el espacio */
+    flex-direction: column;
+    justify-content: center;
+}
+/* --- Estilos Menú Principal (Temas) --- */
+#main-title { 
+    font-size: 1.8em;
+    color: var(--color-africa-naranja); /* <-- COLOR CAMBIADO */
+    margin-bottom: 10px; 
+    line-height: 1.3;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+}
+        
+#subtitle {
+    font-size: 1.1em;
+    color: var(--color-texto);
+    margin: 5px 0;
+}
+        
+#author {
+    font-size: 0.9em;
+    color: #6c757d;
+    margin: 0 0 30px 0;
+}
+
+#topic-header {
+    font-size: 1.6em;
+    color: var(--color-africa-naranja); /* <-- COLOR CAMBIADO */
+    margin-bottom: 25px;
+    font-weight: 700;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+}
+
+/* --- BOTONES DE CONTINENTE (MÁS GRANDES Y DESGASTADOS) --- */
+.topic-btn {
+    display: block;
+    width: 100%;
+    max-width: 500px; 
+    margin: 15px auto; 
+    padding: 22px 28px; 
+    font-size: 1.4em; 
+    font-weight: 700; 
+    cursor: pointer;
+    border: 3px solid rgba(0, 0, 0, 0.3); 
+    border-radius: 15px; 
+    transition: all 0.2s ease;
+    text-align: left;
+    color: var(--color-blanco);
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.4); 
+    box-shadow: 
+        inset 0 1px 4px rgba(255,255,255,0.5), 
+        inset 0 -1px 4px rgba(0,0,0,0.3),    
+        0 4px 8px rgba(0,0,0,0.2),            
+        0 1px 2px rgba(0,0,0,0.1);            
+    filter: grayscale(0.1) saturate(0.8) contrast(1.1); 
+}
+
+.topic-btn:hover:not(:disabled) {
+    transform: translateY(-3px); 
+    box-shadow: 
+        inset 0 1px 4px rgba(255,255,255,0.6), 
+        inset 0 -1px 4px rgba(0,0,0,0.4),
+        0 6px 10px rgba(0,0,0,0.3),
+        0 2px 4px rgba(0,0,0,0.15);
+    filter: grayscale(0) saturate(1) contrast(1.1);
+}
+        
+.topic-btn:disabled {
+    border-color: var(--color-borde);
+    background-color: #f8f9fa;
+    color: #aaa;
+    cursor: not-allowed;
+    filter: none;
+    box-shadow: none;
+    text-shadow: none;
+}
+
+/* --- COLORES DE BOTONES POR CONTINENTE --- */
+.topic-btn[data-continent="europa"] {
+    background: linear-gradient(135deg, #005a9c, #007bff);
+    border-color: #004a80;
+}
+.topic-btn[data-continent="america"] {
+    background: linear-gradient(135deg, #f0ad4e, #28a745);
+    border-color: #c88f2a;
+}
+.topic-btn[data-continent="oceania"] {
+    background: linear-gradient(135deg, #5bc0de, #D2B48C);
+    border-color: #4694ab;
+    color: var(--color-texto);
+    text-shadow: 1px 1px 1px rgba(255,255,255,0.3);
+}
+.topic-btn[data-continent="africa"] {
+    background: linear-gradient(135deg, var(--color-africa-naranja), #dc3545);
+    border-color: #c88f2a;
+}
+.topic-btn[data-continent="asia"] {
+    background: linear-gradient(135deg, #ffc107, #dc3545);
+    border-color: #d39e00;
+}
+.topic-btn[data-continent="mundo"] {
+    background: linear-gradient(135deg, var(--color-beige-boton), #c0a87e);
+    border-color: #937a50;
+    color: var(--color-blanco);
+}
+/* --- Fin Colores Continente --- */
+
+
+/* --- Estilos Menú Dificultad (Oculto) --- */
+#difficulty-selector h2 {
+    font-size: 1.8em;
+    color: var(--color-primario);
+    margin-bottom: 30px;
+}
+.difficulty-btn {
+    display: block;
+    width: 100%;
+    max-width: 320px; 
+    margin: 15px auto;
+    padding: 20px;
+    font-size: 1.3em;
+    font-weight: bold;
+    cursor: pointer;
+    border: none;
+    border-radius: 12px;
+    transition: all 0.2s ease;
+}
+.back-to-topics-btn {
+    background-color: #6c757d;
+    color: white;
+    margin-top: 30px;
+    max-width: 320px;
+}
+.back-to-topics-btn:hover {
+    background-color: #5a6268;
+}
+/* --- Fin Estilos Dificultad --- */
+        
+
+/* --- Estilos del Quiz --- */
+#quiz-header {
+    border-bottom: 2px solid #e0e0e0;
+    padding-bottom: 15px;
+    margin-bottom: 25px;
+}
+        
+#quiz-title {
+    color: var(--color-primario);
+    margin-top: 0;
+    font-size: 1.5em;
+    text-shadow: 0.5px 0.5px 1px rgba(0, 0, 0, 0.1);
+}
+
+/* --- Contenedor para Footer (SOLO nav) --- */
+.quiz-footer {
+    margin-top: 25px;
+}
+
+/* --- BARRA DE ESTADÍSTICAS (CON FUENTE MODIFICADA) --- */
+.stats-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 5px;
+    border-bottom: 2px solid #e0e0e0; 
+    margin-bottom: 20px;
+    margin-top: 15px;
+}
+
+#score-text, #errors-text {
+    font-size: 1.3em; /* <-- TAMAÑO AUMENTADO */
+    font-weight: 700; /* <-- EN NEGRITA */
+    text-shadow: 0.5px 0.5px 1px rgba(0, 0, 0, 0.1);
+}
+
+#score-text {
+    color: var(--color-primario);
+    text-align: left;
+}
+
+#errors-text {
+    color: var(--color-incorrecto);
+    text-align: right;
+}
+/* --- Fin Barra de Estadísticas --- */
+
+
+#question-text {
+    font-size: 1.6em; /* <-- TAMAÑO AUMENTADO */
+    font-weight: 700; /* <-- EN NEGRITA */
+    margin-bottom: 15px; /* Reducido para dar espacio a la bandera */
+    min-height: 40px; /* Reducido */
+    text-shadow: 0.5px 0.5px 1px rgba(0, 0, 0, 0.1);
+}
+
+/* --- *** NUEVOS ESTILOS PARA LA BANDERA *** --- */
+#flag-image {
+    display: block;
+    margin: 15px auto 25px auto; /* Centrado y con espacio */
+    max-width: 150px; /* Ancho máximo */
+    height: 100px; /* Altura fija para consistencia */
+    border: 3px solid rgba(0,0,0,0.3); /* Borde desgastado */
+    border-radius: 10px; /* Redondeado */
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2); /* Sombra */
+    background-color: #f0f0f0; /* Color mientras carga */
+    object-fit: cover; /* Para que la bandera llene el espacio */
+}
+/* --- *** FIN ESTILOS BANDERA *** --- */
+
+
+.btn-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+}
+
+@media (min-width: 600px) {
+    .btn-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* --- Botones de Respuesta (CON FUENTE MODIFICADA) --- */
+.btn {
+    background-color: #f8f9fa;
+    border: 3px solid var(--color-borde); 
+    border-radius: 15px; 
+    padding: 15px 20px;
+    font-size: 1.1em; /* <-- TAMAÑO AUMENTADO */
+    font-weight: 700; /* <-- EN NEGRITA */
+    color: var(--color-texto);
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    text-align: left;
+    line-height: 1.4;
+    box-shadow: 
+        inset 0 1px 3px rgba(0,0,0,0.2), 
+        0 2px 5px rgba(0,0,0,0.1);        
+    filter: grayscale(0.05) saturate(0.9) contrast(1.05); 
+    text-shadow: 0.5px 0.5px 1px rgba(0, 0, 0, 0.1);
+}
+
+.btn:hover:not(:disabled) {
+    background-color: #e9ecef;
+    border-color: #adb5bd;
+    transform: translateY(-1px);
+    box-shadow: 
+        inset 0 1px 3px rgba(0,0,0,0.25), 
+        0 3px 6px rgba(0,0,0,0.15);
+    filter: grayscale(0) saturate(1) contrast(1.1);
+}
+
+.btn:disabled {
+    cursor: not-allowed;
+    opacity: 0.8;
+}
+
+.btn.correct {
+    background-color: var(--color-correcto);
+    color: white;
+    border-color: var(--color-correcto);
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+}
+
+.btn.wrong {
+    background-color: var(--color-incorrecto);
+    color: white;
+    border-color: var(--color-incorrecto);
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+}
+
+/* --- Caja de Explicación (ELIMINADA) --- */
+#explanation-box {
+    display: none;
+}
+
+/* --- Controles (Botones Anterior/Siguiente/Menú) --- */
+.controls {
+    display: flex;
+    justify-content: space-between; 
+    align-items: center;
+    margin-top: 15px; 
+}
+        
+.nav-btn {
+    background-color: var(--color-primario);
+    color: white;
+    font-size: 1.1em; 
+    font-weight: 700; /* <-- EN NEGRITA */
+    padding: 12px 20px;
+    border: none;
+    border-radius: 15px; 
+    cursor: pointer;
+    width: 30%; 
+    min-width: 100px;
+    box-sizing: border-box;
+    text-shadow: 0.5px 0.5px 1px rgba(0, 0, 0, 0.1);
+}
+        
+.nav-btn:hover:not([disabled]) {
+    background-color: #004a80;
+}
+        
+.menu-btn {
+    background-color: var(--color-beige-boton); 
+    color: white; 
+    width: 30%;
+    min-width: 100px;
+}
+.menu-btn:hover {
+    background-color: var(--color-beige-boton-hover); 
+}
+        
+.nav-btn:disabled {
+    background-color: #ced4da;
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+.nav-btn:disabled:hover {
+     background-color: #ced4da;
+}
+        
+#end-game-controls {
+    text-align: center;
+}
+
+#end-game-controls h2, #end-game-controls h3, #end-game-controls p {
+    font-weight: 700; /* Negrita en el resumen final */
+    text-shadow: 0.5px 0.5px 1px rgba(0, 0, 0, 0.1);
+}
+        
+#restart-btn {
+    margin-top: 20px;
+}
+/* --- Fin Estilos Quiz --- */
+
+/* --- CLASES DE VISIBILIDAD --- */
+.hide {
+    display: none;
+}
+        
+.invisible {
+    visibility: hidden;
+}
+
+/* --- Responsive Design (Ajustes adicionales para móvil) --- */
+@media (max-width: 768px) {
+    .container {
+        padding: 25px 20px;
+        margin: 15px auto;
+    }
+
+    #main-title {
+        font-size: 1.5em;
+    }
+
+    #topic-header {
+        font-size: 1.3em;
+    }
+
+    .topic-btn {
+        padding: 18px 20px;
+        font-size: 1.2em;
+    }
+
+    /* --- TAMAÑOS DE FUENTE DEL QUIZ PARA MÓVIL --- */
+    #question-text {
+        font-size: 1.4em; /* Ligeramente más grande en móvil */
+        font-weight: 700;
+    }
+
+    #flag-image {
+        max-width: 120px;
+        height: 80px;
+    }
+    
+    .stats-bar h3 {
+        font-size: 1.1em; /* Ajustado para móvil */
+        font-weight: 700;
+    }
+
+    .btn {
+        font-size: 1em; /* Más grande en móvil */
+        font-weight: 700;
+        padding: 14px 18px;
+    }
+    /* --- Fin tamaños de fuente --- */
+
+    .quiz-footer .controls {
+        flex-direction: row; 
+        flex-wrap: wrap; 
+        gap: 10px;
+    }
+
+    .quiz-footer .controls .nav-btn {
+        flex-grow: 0; 
+        width: calc(50% - 5px); 
+        max-width: none;
+    }
+    
+    .quiz-footer .controls #menu-btn:only-child {
+        width: auto;
+    }
+}
+/* --- DISEÑO DE IMÁGENES RESPONSIVO (VH) --- */
+
+.images-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    margin: 5px auto 15px auto; /* MÁRGENES REDUCIDOS */
+    position: relative;
+    width: 100%;
+    flex-shrink: 1; /* Permite que el contenedor de imágenes se encoja si hace falta */
+}
+
+/* El Mapa: Nunca más alto que el 35% de la pantalla */
+#map-image {
+    flex: 1;
+    width: auto;            /* El ancho se calcula solo */
+    max-width: 100%;
+    height: auto;
+    max-height: 35vh;       /* <--- LÍMITE VERTICAL (35% de la pantalla) */
+    object-fit: contain;    /* Asegura que se vea entero */
+    filter: drop-shadow(0 4px 6px rgba(0,0,0,0.2)); 
+}
+
+/* La Bandera: Nunca más alta que el 20% de la pantalla */
+#flag-image {
+    width: auto;            /* Dejamos que el alto mande */
+    height: auto;
+    max-height: 20vh;       /* <--- LÍMITE VERTICAL (20% de la pantalla) */
+    
+    /* En modo capitales (cuando está sola) permitimos que crezca un poco más */
+    max-width: 250px;       
+    
+    flex-shrink: 0;
+    border: 1px solid #999;
+    box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+    align-self: center;
+    background-color: #fff;
+}
+
+/* AJUSTE ESPECIAL: Si la bandera es la protagonista (Modo Capitales) */
+/* Esto fuerza que aunque el JS le ponga 250px, el CSS la frene si la pantalla es bajita */
+#flag-image[style*="width: 250px"] {
+    max-height: 25vh !important; /* Un poco más grande si está sola */
+    width: auto !important;      /* Sobrescribe el ancho fijo del JS */
+}
+
+/* Estilo para el MAPA (EL REY) */
+#map-image {
+    flex: 1;                 
+    max-width: 550px;        /* Un pelín más grande para compensar */
+    width: 100%;             
+    height: auto;
+    border: none;            
+    filter: drop-shadow(0 4px 6px rgba(0,0,0,0.2)); 
+    padding: 5px;
+}
+
+/* Estilo para la BANDERA (EL ESCUDERO) */
+#flag-image {
+    width: 130px;            /* AUMENTADO: Punto medio (antes 90px) */
+    height: auto;
+    flex-shrink: 0;          
+    border: 1px solid #999;
+    box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+    align-self: center;      
+    background-color: #fff;  /* Fondo blanco por si la bandera tiene transparencias */
+}
+
+/* --- AJUSTE PARA MÓVILES --- */
+@media (max-width: 600px) {
+    .images-wrapper {
+        flex-direction: column; 
+        gap: 15px;
+    }
+
+    #map-image {
+        max-width: 100%;     
+    }
+
+    #flag-image {
+        width: 100px;        /* AUMENTADO: En móvil también un poco más grande */
+        align-self: center;  
+    }
+}
+
+/* --- ESTILOS NUEVOS: MENÚ DE SELECCIÓN DE MODO --- */
+
+/* Botón Verde para Modo Mapas */
+.mode-select-btn[data-mode="maps"] {
+    background: linear-gradient(135deg, #28a745, #218838); 
+    border-color: #1e7e34;
+}
+
+/* Botón Violeta para Modo Capitales */
+.mode-select-btn[data-mode="capitals"] {
+    background: linear-gradient(135deg, #6f42c1, #5a32a3); 
+    border-color: #45257e;
+}
+
+/* Pequeño texto descriptivo dentro del botón */
+.mode-select-btn span {
+    opacity: 0.9;
+    color: #eee;
+    font-style: italic;
+}
+
+/* Botón gris para volver atrás (si te equivocas de modo) */
+#btn-back-home {
+    background-color: #6c757d;
+    color: white;
+    margin-top: 30px;
+    font-size: 1em;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+#btn-back-home:hover {
+    background-color: #5a6268;
+}
+
+/* --- ESTILO BOTÓN FLOTANTE DE INICIO (Lateral Izquierdo) --- */
+#home-btn {
+    position: fixed;            /* Lo fija a la pantalla, no se mueve al hacer scroll */
+    left: 0;                    /* Pegado al borde izquierdo */
+    top: 50%;                   /* A la mitad de la altura */
+    transform: translateY(-50%); /* Truco para centrarlo exactamente */
+    
+    z-index: 2000;              /* Asegura que esté por encima de todo */
+    
+    background-color: #6c757d;  /* Color gris discreto */
+    color: white;
+    border: 2px solid #5a6268;
+    
+    /* Forma de "Pestaña" */
+    border-radius: 0 12px 12px 0; /* Redondeado solo a la derecha */
+    padding: 15px 12px 15px 8px;  /* Un poco más de espacio para agarrarlo */
+    font-size: 1.5em;             /* Icono grande */
+    box-shadow: 3px 0 8px rgba(0,0,0,0.2);
+    
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+#home-btn:hover {
+    background-color: #5a6268;
+    padding-left: 15px; /* Efecto visual: sale un poco al pasar el ratón */
+    width: auto;
+}
+
+/* --- AJUSTE PARA MÓVILES --- */
+/* En pantallas pequeñas, lo subimos arriba a la izquierda para que no moleste */
+@media (max-width: 768px) {
+    #home-btn {
+        top: 10px;              /* Arriba */
+        left: 10px;             /* Un poco separado del borde */
+        transform: none;        /* Quitamos el centrado vertical */
+        border-radius: 50%;     /* Lo hacemos redondo */
+        width: 50px;
+        height: 50px;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2em;
+    }
+}
+
+/* --- MEDIA QUERY PARA PANTALLAS BAJITAS (Móviles apaisados / Laptops pequeños) --- */
+@media (max-height: 750px) {
+    
+    /* Achicamos márgenes y textos */
+    #main-title { font-size: 1.4em; margin-bottom: 5px; }
+    #topic-header { font-size: 1.2em; margin-bottom: 10px; }
+    #question-text { font-size: 1.2em; margin-bottom: 5px; min-height: auto; }
+    
+    /* Los botones de respuesta más compactos */
+    .btn {
+        padding: 8px 10px; /* Menos relleno */
+        font-size: 0.95em;
+    }
+    
+    /* Estadísticas más pequeñas */
+    #score-text, #errors-text { font-size: 1em; margin: 5px 0; }
+    .stats-bar { margin-bottom: 10px; padding: 5px; }
+    
+    /* Imágenes aún más restringidas */
+    #map-image { max-height: 30vh; } 
+    #flag-image { max-height: 18vh; }
+    
+    /* Ocultar subtítulos o autores si es muy necesario ganar espacio */
+    #subtitle, #author { display: none; }
+}
+
+/* --- ESTILOS NUEVOS PARA MULTIJUGADOR --- */
+#room-code-input {
+    width: 80%;
+    max-width: 300px;
+    padding: 15px;
+    font-size: 1.5em;
+    text-align: center;
+    text-transform: uppercase; /* Pone las letras en mayúscula automáticamente */
+    border: 3px solid #ccc;
+    border-radius: 12px;
+    font-family: 'Old Standard TT', serif;
+    font-weight: bold;
+    letter-spacing: 3px;
+    outline: none;
+    margin-bottom: 10px;
+}
+
+#room-code-input:focus {
+    border-color: var(--color-primario);
+    box-shadow: 0 0 10px rgba(0, 90, 156, 0.3);
+}

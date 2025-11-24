@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz de Países y Banderas del Mundo</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Old+Standard+TT:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <button id="home-btn" class="btn" title="Volver al Inicio">🏠</button>
+
+    <div id="mode-menu" class="container">
+        <h2 id="main-title">Geografía Mundial</h2>
+        <p id="subtitle">Elige tu desafío</p>
+        
+        <button class="topic-btn mode-select-btn" data-mode="maps">
+            🗺️ Localizar Países
+            <span style="display:block; font-size:0.7em; font-weight:400; margin-top:5px;">Identifica el país en el mapa</span>
+        </button>
+        
+        <button class="topic-btn mode-select-btn" data-mode="capitals">
+            🏛️ Adivinar Capitales
+            <span style="display:block; font-size:0.7em; font-weight:400; margin-top:5px;">¿Cuál es la capital del país?</span>
+        </button>
+        <button class="topic-btn mode-select-btn" id="btn-go-multiplayer" style="background: linear-gradient(135deg, #343a40, #6c757d); border-color: #343a40;">
+        ⚔️ Duelo 1 vs 1
+        <span style="display:block; font-size:0.7em; font-weight:400; margin-top:5px;">Compite en tiempo real</span>
+        </button>
+    </div>
+
+    <div id="multiplayer-menu" class="container hide">
+    <h2 id="main-title">Modo Vs Online</h2>
+    <p id="subtitle">Juega contra un amigo</p>
+
+    <div id="lobby-controls">
+        <button id="btn-create-room" class="topic-btn" style="background: #28a745;">Crear Sala Nueva</button>
+
+        <div style="margin: 20px 0; font-weight: bold; font-size: 1.2em;">- O -</div>
+
+        <input type="text" id="room-code-input" placeholder="CÓDIGO DE SALA" maxlength="4">
+        <button id="btn-join-room" class="topic-btn" style="background: #17a2b8; margin-top: 10px;">Unirse a Sala</button>
+    </div>
+
+    <div id="lobby-waiting" class="hide">
+        <h3 style="color: var(--color-primario);">Tu Código de Sala:</h3>
+        <div id="display-room-code" style="font-size: 3em; font-weight: bold; letter-spacing: 10px; margin: 15px 0; background: #eee; padding: 10px; border-radius: 10px;">---</div>
+        <p>Comparte este código con tu amigo.</p>
+        <p id="connection-status" style="font-style: italic; color: #666; font-weight: bold; margin-top: 20px;">Esperando al oponente... ⏳</p>
+    </div>
+
+    <button id="btn-back-mode" class="btn" style="margin-top:30px; background-color: #6c757d; color: white;">⬅ Volver</button>
+</div>
+
+    <div id="main-menu" class="container hide">
+        <h2 id="main-title">Quiz Interactivo</h2>
+        <p id="subtitle">Pon a prueba tus conocimientos</p>
+        <p id="author">por: Adrián Fernández Aguirre</p>
+        <h3 id="topic-header">Elija un Continente</h3>
+        
+        <button class="topic-btn" data-continent="europa">Europa</button>
+        <button class="topic-btn" data-continent="asia">Asia</button>
+        <button class="topic-btn" data-continent="america">América</button>
+        <button class="topic-btn" data-continent="africa">África</button>
+        <button class="topic-btn" data-continent="oceania">Oceanía</button>
+        <button class="topic-btn" data-continent="mundo" style="background-color: var(--color-primario); color: white; margin-top: 15px;">Modo: Todo el Mundo</button>
+        
+        <button id="btn-back-home" class="btn" onclick="location.reload()">⬅ Cambiar Modo</button>
+    </div>
+
+    <div class="container hide" id="quiz-main">
+        <div id="quiz-header">
+            <h2 id="quiz-title">Capitales del Mundo</h2> 
+        </div>
+        
+        <div id="question-container">
+            <p id="question-text">Aquí va la pregunta...</p>
+            
+            <div class="images-wrapper">
+                <img id="map-image" src="" alt="Mapa del país" class="hide">
+                <img id="flag-image" src="" alt="Bandera del país" class="hide">
+            </div>
+                
+            <div class="stats-bar hide">
+                <h3 id="score-text">Puntuación: 0 / 0</h3>
+                <h3 id="errors-text">Errores: 0</h3>
+            </div>
+            
+            <div id="answer-buttons" class="btn-grid"></div>
+
+            <div class="quiz-footer hide">
+                <div class="controls">
+                    <button id="prev-btn" class="nav-btn btn invisible">Anterior</button>
+                    <button id="menu-btn" class="nav-btn menu-btn btn">Menú</button>
+                    <button id="next-btn" class="nav-btn btn invisible">Siguiente</button>
+                </div>
+            </div>
+        </div> 
+        <div id="end-game-controls" class="hide">
+             <div id="result-text"></div>
+             <button id="restart-btn" class="nav-btn menu-btn btn">Volver al Menú</button>
+        </div>
+    </div>
+
+    <script type="module" src="script.js"></script>
+</body>
+</html>
