@@ -608,6 +608,13 @@ document.querySelectorAll('.topic-btn').forEach(btn => {
 // --- FUNCIONES DE FLUJO ---
 function startQuizFlow() {
     quizMain.classList.remove('hide');
+    
+    // 🔴 NUEVO: Aseguramos que las preguntas y cabecera sean visibles al empezar
+    // Esto es obligatorio porque la función endQuiz las oculta.
+    document.getElementById('question-container').classList.remove('hide');
+    document.getElementById('quiz-header').classList.remove('hide');
+    endGameControls.classList.add('hide'); // Ocultamos resultados anteriores por seguridad
+    
     quizFooter.classList.remove('hide');
     statsBar.classList.remove('hide'); 
     score = 0; errors = 0; currentQuestionIndex = 0; scoreHistory = {};
@@ -748,22 +755,24 @@ prevButton.addEventListener('click', () => {
 
 // --- FIN DEL JUEGO ---
 function endQuiz() {
-    quizMain.classList.add('hide');
+    // 🔴 CORRECCIÓN: NO ocultamos quizMain, porque contiene la pantalla de resultados.
+    // quizMain.classList.add('hide'); <--- ESTA ERA LA LÍNEA CULPABLE
+
+    // ✅ LO QUE HACEMOS AHORA: Ocultamos solo las preguntas y el título
+    document.getElementById('question-container').classList.add('hide');
+    document.getElementById('quiz-header').classList.add('hide');
     
     if (!isMultiplayer) {
         // Single Player
-        document.getElementById('quiz-header').classList.add('hide');
-        quizMain.classList.remove('hide');
-        var finalScore = (score / totalQuestions) * 10;
-        var mensaje = (finalScore >= 5) ? "Bien hecho" : "Sigue practicando";
-        if (finalScore >= 9) mensaje = "¡Excelente trabajo!";
-        resultText.innerHTML = `<h2>${mensaje}</h2><p>Puntuación: ${score} / ${totalQuestions}</p>`;
-        endGameControls.classList.remove('hide');
+        showFinalResultsHTML();
     } else {
         // Multiplayer
         iHaveFinished = true;
-        document.getElementById('quiz-header').classList.add('hide');
+        
+        // Aseguramos que el contenedor principal sea visible
+        quizMain.classList.remove('hide');
         endGameControls.classList.remove('hide');
+        
         // Mostrar loader mientras esperamos al otro
         resultText.innerHTML = '<h2>¡Has terminado!</h2><p>Esperando a que tu oponente termine...</p><div style="font-size:3em; animation: spin 2s linear infinite;">⏳</div>';
         
@@ -771,13 +780,18 @@ function endQuiz() {
             finished: true,
             score: score
         });
-        // No llamamos a checkWinner aquí, porque la función listenToRoom lo hará automáticamente
     }
 }
 
 function showMultiplayerResults(myScore, oppScore) {
+    // Aseguramos que el contenedor padre está visible
+    quizMain.classList.remove('hide'); 
+    
+    // Ocultamos preguntas y cabecera por seguridad
     document.getElementById('quiz-header').classList.add('hide');
-    quizMain.classList.add('hide'); // Ocultar juego si estaba activo
+    document.getElementById('question-container').classList.add('hide');
+
+    // Mostramos los controles finales
     endGameControls.classList.remove('hide');
     
     let msg = "";
@@ -810,5 +824,22 @@ function preloadImages(index) {
         if (nextQ.code) (new Image()).src = 'https://flagcdn.com/w160/' + nextQ.code + '.png';
         if (gameMode === 'maps' && nextQ.map) (new Image()).src = 'https://commons.wikimedia.org/w/index.php?title=Special:Redirect/file/' + nextQ.map + '&width=550';
     }
+}
+
+function showFinalResultsHTML() {
+    // Asegurar que el contenedor principal es visible
+    quizMain.classList.remove('hide');
+    
+    // Ocultar preguntas y cabecera para dejar sitio al resultado
+    document.getElementById('question-container').classList.add('hide');
+    document.getElementById('quiz-header').classList.add('hide');
+
+    var finalScore = (score / totalQuestions) * 10;
+    var mensaje = (finalScore >= 5) ? "Bien hecho" : "Sigue practicando";
+    if (finalScore >= 9) mensaje = "¡Excelente trabajo!";
+    
+    // Mostrar el resultado
+    resultText.innerHTML = `<h2>${mensaje}</h2><p>Puntuación: ${score} / ${totalQuestions}</p>`;
+    endGameControls.classList.remove('hide');
 }
 if (document.getElementById('home-btn')) document.getElementById('home-btn').addEventListener('click', () => location.reload());
