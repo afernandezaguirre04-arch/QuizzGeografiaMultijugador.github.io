@@ -409,13 +409,22 @@ var scoreHistory = {};
 // ------------------------------------
 // --- LÓGICA DE MENÚS ---
 // ------------------------------------
+// 1. Selección de Modo (Mapas, Capitales, O MULTIJUGADOR)
 document.querySelectorAll('.mode-select-btn').forEach(btn => {
     btn.addEventListener('click', function() {
         if (btn.id === 'btn-go-multiplayer') {
+            // Ir al menú multijugador
             modeMenu.classList.add('hide');
             multiplayerMenu.classList.remove('hide');
         } else {
-            isMultiplayer = false;
+            // Selección de Mapas o Capitales
+            
+            // 🔴 CORRECCIÓN: Solo desactivamos el modo multijugador si NO estamos ya en una sala
+            if (!myRoomId) {
+                isMultiplayer = false;
+            }
+            // Si myRoomId tiene valor (somos Host eligiendo modo), isMultiplayer se mantiene true
+
             gameMode = btn.dataset.mode;
             currentQuestions = (gameMode === 'maps') ? questionsMaps : questionsCapitals;
             document.getElementById('topic-header').innerText = (gameMode === 'maps') ? "Elige un Continente (Mapas)" : "Elige un Continente (Capitales)";
