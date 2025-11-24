@@ -3,11 +3,8 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebas
 import { getDatabase, ref, set, onValue, update } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-database.js";
 
 // ------------------------------------------------------------------
-// 🔴 CONFIGURACIÓN DE FIREBASE (AQUÍ ES DONDE TIENES QUE EDITAR) 🔴
+// 🔴 CONFIGURACIÓN DE FIREBASE (VUELVE A PEGAR TUS DATOS AQUÍ) 🔴
 // ------------------------------------------------------------------
-// Borra el bloque de abajo y pega el que copiaste de la consola de Firebase.
-// Debe quedar algo como: const firebaseConfig = { apiKey: "...", ... };
-
   const firebaseConfig = {
     apiKey: "AIzaSyAG2wqXXCmZPrZoOP_QlM04_pn8bcsrZlY",
     authDomain: "quizz-geografia-multijugador.firebaseapp.com",
@@ -18,7 +15,7 @@ import { getDatabase, ref, set, onValue, update } from "https://www.gstatic.com/
     measurementId: "G-JF15JBES1V"
   };
 
-// --- INICIALIZACIÓN DE LA APP ---
+// --- INICIALIZACIÓN ---
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
@@ -27,6 +24,8 @@ let isMultiplayer = false;
 let myRoomId = null;
 let amIHost = false; 
 let playerRole = ''; // 'p1' o 'p2'
+let hasGameStarted = false; // 🔴 NUEVO: Evita que el juego se reinicie solo
+let iHaveFinished = false;  // 🔴 NUEVO: Control de estado local
 
 // --- FUNCIÓN DE BARAJADO ---
 function shuffleArray(array) {
@@ -41,9 +40,8 @@ function shuffleArray(array) {
 }
 
 // ----------------------------------------------------
-// --- TUS BANCOS DE PREGUNTAS (DATOS ORIGINALES) ---
+// --- TUS BANCOS DE PREGUNTAS (PEGA TUS DATOS) ---
 // ----------------------------------------------------
-
 var questionsMaps = {
     'europa': [
         { question: '¿Qué país es?', code: 'es', map: 'Spain_in_Europe.svg', answers: [{ text: 'España', correct: true }, { text: 'Portugal', correct: false }, { text: 'Francia', correct: false }, { text: 'Italia', correct: false }] },
@@ -366,8 +364,8 @@ var questionsCapitals = {
     ]
 };
 
-// Creación de modos 'Mundo' para ambos
-questionsMaps['mundo'] = [].concat(questionsMaps.europa, questionsMaps.asia, questionsMaps.america, questionsMaps.africa, questionsMaps.oceania);
+// Rellenar mundo (Lógica original) - IMPORTANTE
+questionsMaps['mundo'] = [].concat(questionsMaps.europa || [], questionsMaps.asia || [], questionsMaps.america || [], questionsMaps.africa || [], questionsMaps.oceania || []);
 questionsCapitals['mundo'] = []; 
 if(questionsCapitals.europa) questionsCapitals['mundo'] = questionsCapitals['mundo'].concat(questionsCapitals.europa);
 if(questionsCapitals.asia) questionsCapitals['mundo'] = questionsCapitals['mundo'].concat(questionsCapitals.asia);
@@ -375,15 +373,12 @@ if(questionsCapitals.america) questionsCapitals['mundo'] = questionsCapitals['mu
 if(questionsCapitals.africa) questionsCapitals['mundo'] = questionsCapitals['mundo'].concat(questionsCapitals.africa);
 if(questionsCapitals.oceania) questionsCapitals['mundo'] = questionsCapitals['mundo'].concat(questionsCapitals.oceania);
 
-
 // --- ELEMENTOS DEL DOM ---
 var modeMenu = document.getElementById('mode-menu');
 var multiplayerMenu = document.getElementById('multiplayer-menu');
 var mainMenu = document.getElementById('main-menu');
 var quizMain = document.getElementById('quiz-main');
 var endGameControls = document.getElementById('end-game-controls');
-
-// Elementos del juego
 var questionText = document.getElementById('question-text');
 var flagImage = document.getElementById('flag-image');
 var mapImage = document.getElementById('map-image');
@@ -392,8 +387,6 @@ var scoreText = document.getElementById('score-text');
 var errorsText = document.getElementById('errors-text');
 var resultText = document.getElementById('result-text');
 var quizTitle = document.getElementById('quiz-title');
-
-// Botones
 var nextButton = document.getElementById('next-btn');
 var prevButton = document.getElementById('prev-btn');
 var menuButton = document.getElementById('menu-btn');
@@ -401,9 +394,9 @@ var restartButton = document.getElementById('restart-btn');
 var quizFooter = document.querySelector('.quiz-footer');
 var statsBar = document.querySelector('.stats-bar');
 
-// --- VARIABLES DE ESTADO ---
+// --- VARIABLES DE JUEGO ---
 var currentQuestions = {}; 
-var gameMode = ''; // 'maps' o 'capitals'
+var gameMode = ''; 
 var selectedContinent = ''; 
 var questionsBank = []; 
 var shuffledQuestions = [];
@@ -414,18 +407,14 @@ var totalQuestions = 0;
 var scoreHistory = {}; 
 
 // ------------------------------------
-// --- LÓGICA DE MENÚS (MODIFICADA) ---
+// --- LÓGICA DE MENÚS ---
 // ------------------------------------
-
-// 1. Selección de Modo (Mapas, Capitales, O MULTIJUGADOR)
 document.querySelectorAll('.mode-select-btn').forEach(btn => {
     btn.addEventListener('click', function() {
         if (btn.id === 'btn-go-multiplayer') {
-            // Ir al menú multijugador
             modeMenu.classList.add('hide');
             multiplayerMenu.classList.remove('hide');
         } else {
-            // Modo Solo (Mapas o Capitales)
             isMultiplayer = false;
             gameMode = btn.dataset.mode;
             currentQuestions = (gameMode === 'maps') ? questionsMaps : questionsCapitals;
@@ -436,17 +425,15 @@ document.querySelectorAll('.mode-select-btn').forEach(btn => {
     });
 });
 
-// Botón volver del multijugador
 document.getElementById('btn-back-mode').addEventListener('click', function() {
     multiplayerMenu.classList.add('hide');
     modeMenu.classList.remove('hide');
 });
 
 // --------------------------------------------
-// --- LÓGICA MULTIJUGADOR (FIREBASE) ---
+// --- LÓGICA MULTIJUGADOR (CORREGIDA) ---
 // --------------------------------------------
 
-// Generar código aleatorio de 4 letras
 function generateRoomCode() {
     const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
     let result = '';
@@ -454,30 +441,28 @@ function generateRoomCode() {
     return result;
 }
 
-// CREAR SALA (Host)
+// CREAR SALA
 document.getElementById('btn-create-room').addEventListener('click', function() {
     myRoomId = generateRoomCode();
     amIHost = true;
     playerRole = 'p1';
     isMultiplayer = true;
+    hasGameStarted = false;
+    iHaveFinished = false;
 
-    // Mostrar UI de espera
     document.getElementById('lobby-controls').classList.add('hide');
     document.getElementById('lobby-waiting').classList.remove('hide');
     document.getElementById('display-room-code').innerText = myRoomId;
 
-    // Crear sala en Firebase
     set(ref(db, 'rooms/' + myRoomId), {
         status: 'waiting',
         p1: { joined: true, finished: false, score: 0 },
         p2: { joined: false, finished: false, score: 0 }
     });
-
-    // Escuchar cambios en la sala
     listenToRoom();
 });
 
-// UNIRSE SALA (Invitado)
+// UNIRSE SALA
 document.getElementById('btn-join-room').addEventListener('click', function() {
     const codeInput = document.getElementById('room-code-input').value.toUpperCase().trim();
     if (codeInput.length !== 4) return alert("El código debe tener 4 caracteres");
@@ -486,118 +471,116 @@ document.getElementById('btn-join-room').addEventListener('click', function() {
     amIHost = false;
     playerRole = 'p2';
     isMultiplayer = true;
+    hasGameStarted = false;
+    iHaveFinished = false;
 
-    // Verificar si existe y unirse
     const roomRef = ref(db, 'rooms/' + myRoomId);
-    
-    // Leer una vez para ver si existe
     onValue(roomRef, (snapshot) => {
         const data = snapshot.val();
         if (data && data.status === 'waiting') {
-            // Unirse oficialmente
             update(ref(db, 'rooms/' + myRoomId + '/p2'), { joined: true });
-            update(ref(db, 'rooms/' + myRoomId), { status: 'ready' }); // Sala lista
+            update(ref(db, 'rooms/' + myRoomId), { status: 'ready' });
             
             document.getElementById('lobby-controls').classList.add('hide');
             document.getElementById('lobby-waiting').classList.remove('hide');
             document.getElementById('display-room-code').innerText = myRoomId;
             document.getElementById('connection-status').innerText = "Conectado. Esperando que el Host elija juego...";
-            
-            // Empezar a escuchar
             listenToRoom();
         } else {
-            alert("Sala no encontrada, llena o el juego ya empezó.");
+            alert("Sala no encontrada o error de conexión.");
         }
     }, { onlyOnce: true });
 });
 
-// ESCUCHAR CAMBIOS EN LA SALA (El corazón del online)
+// 🔴 ESCUCHA CENTRAL DEL JUEGO (AQUÍ ESTÁ LA SOLUCIÓN) 🔴
 function listenToRoom() {
     const roomRef = ref(db, 'rooms/' + myRoomId);
     onValue(roomRef, (snapshot) => {
         const data = snapshot.val();
         if (!data) return;
 
-        // Si soy Host y P2 se une
+        // 1. DETECTAR RIVAL EN EL LOBBY
         if (amIHost && data.p2.joined && data.status === 'ready') {
-            document.getElementById('connection-status').innerText = "¡Jugador 2 conectado! Elige un modo.";
-            // Llevar al host al menú de selección
+            document.getElementById('connection-status').innerText = "¡Jugador 2 conectado!";
             setTimeout(() => {
                 multiplayerMenu.classList.add('hide');
-                isMultiplayer = true; 
-                // Usamos el menú principal para elegir continente
                 document.getElementById('main-title').innerText = "Elige Modo para Ambos";
                 document.getElementById('mode-menu').classList.remove('hide');
                 document.getElementById('multiplayer-menu').classList.add('hide');
-                document.getElementById('btn-go-multiplayer').classList.add('hide'); // Ocultar botón MP
+                document.getElementById('btn-go-multiplayer').classList.add('hide');
             }, 1000);
         }
 
-        // Si el juego ha empezado (data.status == 'playing')
-        if (data.status === 'playing') {
-            // Configurar el juego con los datos de la nube
+        // 2. DETECTAR INICIO DE JUEGO (Solo si no ha empezado ya para mí)
+        if (data.status === 'playing' && !hasGameStarted) {
+            // Cargar configuración
             if (data.config) {
                 gameMode = data.config.mode;
                 selectedContinent = data.config.continent;
                 const questionIndices = data.config.indices;
 
-                // Cargar banco correcto
+                // Cargar banco
                 let baseBank = (gameMode === 'maps') ? questionsMaps[selectedContinent] : questionsCapitals[selectedContinent];
                 
-                // Reconstruir el array barajado IDÉNTICO para los dos
+                // Seguridad: Si no hay preguntas, avisar
+                if(!baseBank) {
+                    alert("Error: No se encontraron las preguntas. Recarga la página.");
+                    return;
+                }
+
+                // Reconstruir preguntas
                 shuffledQuestions = questionIndices.map(index => baseBank[index]);
                 totalQuestions = shuffledQuestions.length;
 
-                // Iniciar interfaz
+                // Ocultar menús y lobby
                 modeMenu.classList.add('hide');
                 mainMenu.classList.add('hide');
                 multiplayerMenu.classList.add('hide');
                 document.getElementById('lobby-waiting').classList.add('hide');
                 
                 // Títulos
-                if (gameMode === 'maps') {
-                    document.getElementById('quiz-title').innerText = "VS: Localiza " + selectedContinent;
-                } else {
-                    document.getElementById('quiz-title').innerText = "VS: Capitales " + selectedContinent;
-                }
+                let displayContinent = selectedContinent.charAt(0).toUpperCase() + selectedContinent.slice(1);
+                if (gameMode === 'maps') document.getElementById('quiz-title').innerText = "VS: Localiza " + displayContinent;
+                else document.getElementById('quiz-title').innerText = "VS: Capitales " + displayContinent;
                 
+                // MARCAR QUE YA EMPEZÓ PARA NO REINICIAR
+                hasGameStarted = true;
+                
+                // INICIAR
                 startQuizFlow();
             }
         }
 
-        // Monitorear final del rival
-        let rivalRole = (playerRole === 'p1') ? 'p2' : 'p1';
-        if (data[rivalRole].finished) {
-            checkDualFinish(); // Ver si ambos acabamos
+        // 3. DETECTAR FINAL DEL JUEGO (Si AMBOS terminaron)
+        if (data.p1.finished && data.p2.finished) {
+            // Calcular resultados
+            let myScore = (playerRole === 'p1') ? data.p1.score : data.p2.score;
+            let oppScore = (playerRole === 'p1') ? data.p2.score : data.p1.score;
+            
+            // Ocultar loader y mostrar ganador
+            showMultiplayerResults(myScore, oppScore);
         }
     });
 }
 
-// ---------------------------------------------
-// --- SELECCIÓN DE CONTINENTE (SINGLE + MP) ---
-// ---------------------------------------------
+// SELECCIÓN DE CONTINENTE (Host dispara esto)
 document.querySelectorAll('.topic-btn').forEach(btn => {
     btn.addEventListener('click', function() {
-        if (btn.classList.contains('mode-select-btn')) return; // Ignorar botones de modo
-        if (isMultiplayer && !amIHost && btn.id !== 'btn-create-room' && btn.id !== 'btn-join-room') return; // Invitado no toca nada
+        if (btn.classList.contains('mode-select-btn')) return;
+        if (isMultiplayer && !amIHost && btn.id !== 'btn-create-room' && btn.id !== 'btn-join-room') return;
 
         let continent = btn.dataset.continent;
         
         if (isMultiplayer) {
             if (amIHost) {
-                // Si soy Host, decido el juego
-                // Si no se eligió modo antes (porque reutilizamos el menú), asumimos Mapas por defecto o preguntamos.
-                // Para simplificar: Si vienes de crear sala -> Mapas. 
-                // Mejor: Preguntar rápido o asumir Mapas. Asumiremos Mapas si no se define.
                 if (!gameMode) gameMode = 'maps'; 
-
                 let baseQuestions = (gameMode === 'maps') ? questionsMaps[continent] : questionsCapitals[continent];
                 
-                // Crear orden barajado
+                // Generar índices
                 let indices = Array.from(Array(baseQuestions.length).keys());
                 indices = shuffleArray(indices); 
 
-                // SUBIR A FIREBASE (ESTO INICIA EL JUEGO EN AMBOS)
+                // SUBIR A FIREBASE (Esto activará el listenToRoom en ambos)
                 update(ref(db, 'rooms/' + myRoomId), {
                     status: 'playing',
                     config: {
@@ -608,70 +591,48 @@ document.querySelectorAll('.topic-btn').forEach(btn => {
                 });
             }
         } else {
-            // MODO SOLO (Lógica original)
             selectContinent(continent, btn.innerText);
         }
     });
 });
 
-// --- FUNCIÓN UNIFICADA DE INICIO ---
+// --- FUNCIONES DE FLUJO ---
 function startQuizFlow() {
     quizMain.classList.remove('hide');
     quizFooter.classList.remove('hide');
     statsBar.classList.remove('hide'); 
-    score = 0;
-    errors = 0;
-    currentQuestionIndex = 0;
-    scoreHistory = {};
+    score = 0; errors = 0; currentQuestionIndex = 0; scoreHistory = {};
     updateStats();
-    
-    // Resetear respuestas en objetos
     shuffledQuestions.forEach(q => { q.isAnswered = false; q.userAnswerText = null; });
-    
     preloadImages(1);
     showQuestion(shuffledQuestions[0]);
 }
 
-// Mantiene la lógica original de Single Player
 function selectContinent(continent, name) {
     selectedContinent = continent;
     questionsBank = currentQuestions[continent];
     if (!questionsBank) return alert("Sin preguntas");
-    
     shuffledQuestions = shuffleArray(questionsBank);
     totalQuestions = shuffledQuestions.length;
-    
     mainMenu.classList.add('hide');
     endGameControls.classList.add('hide');
     quizMain.classList.remove('hide');
     quizFooter.classList.remove('hide');
     statsBar.classList.remove('hide');
-
-    // Título
     let cleanName = name.replace('Modo: ', '').split(' (')[0];
-    if (gameMode === 'maps') quizTitle.innerText = "Localiza: " + cleanName;
-    else quizTitle.innerText = "Capitales de " + cleanName;
-    
-    // Reiniciar
-    score = 0; errors = 0; scoreHistory = {};
-    updateStats();
+    quizTitle.innerText = (gameMode === 'maps') ? "Localiza: " + cleanName : "Capitales de " + cleanName;
+    score = 0; errors = 0; scoreHistory = {}; updateStats();
     currentQuestionIndex = 0;
-    shuffledQuestions.forEach(function(q) { q.isAnswered = false; q.userAnswerText = null; });
-
+    shuffledQuestions.forEach(q => { q.isAnswered = false; q.userAnswerText = null; });
     preloadImages(1);
     showQuestion(shuffledQuestions[0]);
 }
-
-// --------------------------------------
-// --- RENDERIZADO DE PREGUNTAS ---
-// --------------------------------------
 
 function showQuestion(question) {
     resetState();
     questionText.innerText = question.question; 
 
     if (gameMode === 'maps') {
-        // MODO MAPAS
         if (question.code && question.map) {
             flagImage.src = 'https://flagcdn.com/w160/' + question.code + '.png';
             flagImage.classList.remove('hide');
@@ -682,7 +643,6 @@ function showQuestion(question) {
             preloadImages(currentQuestionIndex + 1);
         }
     } else {
-        // MODO CAPITALES
         if (question.code) {
             flagImage.src = 'https://flagcdn.com/w160/' + question.code + '.png';
             flagImage.classList.remove('hide');
@@ -702,9 +662,7 @@ function showQuestion(question) {
         nextButton.classList.add('invisible');
     }
 
-    // Barajar respuestas visualmente
     var currentAnswers = shuffleArray(question.answers);
-    
     currentAnswers.forEach(answer => {
         var button = document.createElement('button');
         button.innerText = answer.text;
@@ -723,13 +681,10 @@ function showQuestion(question) {
 }
 
 function resetState() {
-    flagImage.classList.add('hide');
-    mapImage.classList.add('hide');
+    flagImage.classList.add('hide'); mapImage.classList.add('hide');
     flagImage.src = ""; mapImage.src = "";
     flagImage.style.width = ""; mapImage.style.display = "";
-    while (answerButtonsElement.firstChild) {
-        answerButtonsElement.removeChild(answerButtonsElement.firstChild);
-    }
+    while (answerButtonsElement.firstChild) answerButtonsElement.removeChild(answerButtonsElement.firstChild);
 }
 
 function selectAnswer(e) {
@@ -749,30 +704,22 @@ function selectAnswer(e) {
     
     recalculateScore();
     updateStats();
-
     Array.from(answerButtonsElement.children).forEach(btn => {
         btn.disabled = true;
         setStatusClass(btn, btn.dataset.correct === "true");
     });
-
     nextButton.innerText = (shuffledQuestions.length > currentQuestionIndex + 1) ? "Siguiente" : "Finalizar Quiz";
     nextButton.classList.remove('invisible');
 }
 
 function setStatusClass(element, correct) {
-    element.classList.remove('correct');
-    element.classList.remove('wrong');
+    element.classList.remove('correct'); element.classList.remove('wrong');
     if (correct) element.classList.add('correct');
-    else {
-        if (element.disabled && element.innerText === shuffledQuestions[currentQuestionIndex].userAnswerText) {
-            element.classList.add('wrong');
-        }
-    }
+    else if (element.disabled && element.innerText === shuffledQuestions[currentQuestionIndex].userAnswerText) element.classList.add('wrong');
 }
 
 function recalculateScore() {
-    score = 0;
-    for (var key in scoreHistory) score += scoreHistory[key];
+    score = 0; for (var key in scoreHistory) score += scoreHistory[key];
 }
 
 function updateStats() {
@@ -780,102 +727,74 @@ function updateStats() {
     errorsText.innerText = 'Errores: ' + errors;
 }
 
-// --- NAVEGACIÓN ---
 nextButton.addEventListener('click', () => {
     currentQuestionIndex++;
     if (currentQuestionIndex < shuffledQuestions.length) showQuestion(shuffledQuestions[currentQuestionIndex]);
     else endQuiz();
 });
-
 prevButton.addEventListener('click', () => {
     currentQuestionIndex--;
     showQuestion(shuffledQuestions[currentQuestionIndex]);
 });
 
-// --------------------------------------
-// --- FINAL DEL JUEGO (ADAPTADO) ---
-// --------------------------------------
-
+// --- FIN DEL JUEGO ---
 function endQuiz() {
     quizMain.classList.add('hide');
     
-    // Si es Single Player, mostrar resultado directo
     if (!isMultiplayer) {
-        showFinalResultsHTML();
+        // Single Player
+        document.getElementById('quiz-header').classList.add('hide');
+        quizMain.classList.remove('hide');
+        var finalScore = (score / totalQuestions) * 10;
+        var mensaje = (finalScore >= 5) ? "Bien hecho" : "Sigue practicando";
+        if (finalScore >= 9) mensaje = "¡Excelente trabajo!";
+        resultText.innerHTML = `<h2>${mensaje}</h2><p>Puntuación: ${score} / ${totalQuestions}</p>`;
+        endGameControls.classList.remove('hide');
     } else {
-        // MODO MULTIJUGADOR: SUBIR RESULTADO Y ESPERAR
+        // Multiplayer
+        iHaveFinished = true;
         document.getElementById('quiz-header').classList.add('hide');
         endGameControls.classList.remove('hide');
+        // Mostrar loader mientras esperamos al otro
         resultText.innerHTML = '<h2>¡Has terminado!</h2><p>Esperando a que tu oponente termine...</p><div style="font-size:3em; animation: spin 2s linear infinite;">⏳</div>';
         
-        // Subir mi resultado
         update(ref(db, 'rooms/' + myRoomId + '/' + playerRole), {
             finished: true,
             score: score
         });
-        
-        checkDualFinish();
+        // No llamamos a checkWinner aquí, porque la función listenToRoom lo hará automáticamente
     }
 }
 
-function checkDualFinish() {
-    // Verificar si ambos acabaron
-    const roomRef = ref(db, 'rooms/' + myRoomId);
-    onValue(roomRef, (snapshot) => {
-        const data = snapshot.val();
-        if (data && data.p1.finished && data.p2.finished) {
-            // AMBOS ACABARON -> CALCULAR GANADOR
-            let myScore = (playerRole === 'p1') ? data.p1.score : data.p2.score;
-            let oppScore = (playerRole === 'p1') ? data.p2.score : data.p1.score;
-            
-            let msg = "";
-            let color = "";
-            if (myScore > oppScore) { msg = "¡HAS GANADO! 🏆"; color = "#28a745"; }
-            else if (myScore < oppScore) { msg = "Has perdido... 😢"; color = "#dc3545"; }
-            else { msg = "¡EMPATE! 🤝"; color = "#005a9c"; }
-            
-            resultText.innerHTML = `
-                <h2 style="color:${color}; font-size: 2.5em; margin-bottom: 20px;">${msg}</h2>
-                <div style="display:flex; justify-content:center; gap: 40px; margin: 20px 0;">
-                    <div style="text-align:center;">
-                        <h3>Tú</h3>
-                        <p style="font-size:2em; font-weight:bold; color:${color};">${myScore}</p>
-                    </div>
-                    <div style="text-align:center;">
-                        <h3>Rival</h3>
-                        <p style="font-size:2em; font-weight:bold; color:#666;">${oppScore}</p>
-                    </div>
-                </div>
-            `;
-        }
-    }, { onlyOnce: true });
-}
-
-function showFinalResultsHTML() {
-    // Lógica original de resultados single player
+function showMultiplayerResults(myScore, oppScore) {
     document.getElementById('quiz-header').classList.add('hide');
-    quizMain.classList.remove('hide');
-    var finalScore = (score / totalQuestions) * 10;
-    
-    var mensaje = "";
-    if (finalScore >= 9) mensaje = "¡Excelente trabajo!";
-    else if (finalScore >= 7) mensaje = "¡Muy bien hecho!";
-    else if (finalScore >= 5) mensaje = "Buen intento.";
-    else mensaje = "Sigue practicando.";
-
-    resultText.innerHTML = '<h2>' + mensaje + '</h2>' +
-                           '<p>Tu puntuación final es: <strong>' + score + '</strong> de ' + totalQuestions + '.</p>' +
-                           '<p>Total de errores: ' + errors + '</p>' +
-                           '<h3>Nota: ' + finalScore.toFixed(1) + '/10</h3>';
-    
+    quizMain.classList.add('hide'); // Ocultar juego si estaba activo
     endGameControls.classList.remove('hide');
+    
+    let msg = "";
+    let color = "";
+    if (myScore > oppScore) { msg = "¡HAS GANADO! 🏆"; color = "#28a745"; }
+    else if (myScore < oppScore) { msg = "Has perdido... 😢"; color = "#dc3545"; }
+    else { msg = "¡EMPATE! 🤝"; color = "#005a9c"; }
+    
+    resultText.innerHTML = `
+        <h2 style="color:${color}; font-size: 2.5em; margin-bottom: 20px;">${msg}</h2>
+        <div style="display:flex; justify-content:center; gap: 40px; margin: 20px 0;">
+            <div style="text-align:center;">
+                <h3>Tú</h3>
+                <p style="font-size:2em; font-weight:bold; color:${color};">${myScore}</p>
+            </div>
+            <div style="text-align:center;">
+                <h3>Rival</h3>
+                <p style="font-size:2em; font-weight:bold; color:#666;">${oppScore}</p>
+            </div>
+        </div>
+    `;
 }
 
-// Botones de salida
 menuButton.addEventListener('click', () => location.reload());
 restartButton.addEventListener('click', () => location.reload());
 
-// Precarga de imágenes
 function preloadImages(index) {
     if (index < shuffledQuestions.length) {
         var nextQ = shuffledQuestions[index];
@@ -883,8 +802,4 @@ function preloadImages(index) {
         if (gameMode === 'maps' && nextQ.map) (new Image()).src = 'https://commons.wikimedia.org/w/index.php?title=Special:Redirect/file/' + nextQ.map + '&width=550';
     }
 }
-
-// Botón Home flotante
-if (document.getElementById('home-btn')) {
-    document.getElementById('home-btn').addEventListener('click', () => location.reload());
-}
+if (document.getElementById('home-btn')) document.getElementById('home-btn').addEventListener('click', () => location.reload());
