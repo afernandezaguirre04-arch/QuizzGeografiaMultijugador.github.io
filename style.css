@@ -658,6 +658,29 @@ body {
     outline: none;
     margin-bottom: 10px;
 }
+/* --- ESTILO DEL BOTÓN "VOLVER AL MENÚ" --- */
+.btn-portal {
+    display: inline-block;       /* Necesario para que respete el tamaño */
+    margin-top: 30px;            /* Lo separa de los botones de arriba */
+    padding: 12px 24px;          /* Lo hace "gordito" (relleno) */
+    background-color: #f8f9fa;   /* Fondo blanco/grisáceo limpio */
+    color: #2d3748;              /* Letra gris oscura */
+    text-decoration: none;       /* Quita el subrayado típico de los enlaces */
+    border-radius: 50px;         /* Bordes totalmente redondos */
+    border: 2px solid #cbd5e0;   /* Un borde gris suave */
+    font-weight: bold;           /* Letra en negrita */
+    font-family: sans-serif;     /* Fuente sencilla y legible */
+    transition: all 0.2s ease;   /* Para que la animación sea suave */
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05); /* Sombra muy sutil */
+}
+
+/* Efecto al pasar el ratón por encima */
+.btn-portal:hover {
+    background-color: #e2e8f0;   /* Se oscurece un poco */
+    transform: translateY(-3px); /* Se levanta un poquito */
+    box-shadow: 0 6px 8px rgba(0,0,0,0.1);
+    border-color: #a0aec0;
+}
 
 #room-code-input:focus {
     border-color: var(--color-primario);
